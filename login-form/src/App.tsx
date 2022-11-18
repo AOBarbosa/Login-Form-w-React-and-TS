@@ -1,7 +1,18 @@
 import { Routes, Route, Link } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Private } from "./pages/Private";
+import "./App.css";
+import { RequireAuth } from "./contexts/Auth/RequireAuth";
+import { useContext } from "react";
+import { AuthContext } from "./contexts/Auth/AuthContext";
 function App() {
+  const auth = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    await auth.signout();
+    window.location.href = window.location.href;
+  };
+
   return (
     <div className="App">
       <header>
@@ -9,12 +20,20 @@ function App() {
         <nav>
           <Link to="/">Home</Link>
           <Link to="/private">Private Page</Link>
+          {auth.user && <button onClick={handleLogout}>Logout</button>}
         </nav>
       </header>
       <hr />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/private" element={<Private />} />
+        <Route
+          path="/private"
+          element={
+            <RequireAuth>
+              <Private />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </div>
   );
